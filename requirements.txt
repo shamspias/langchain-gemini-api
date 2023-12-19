@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+pillow
+python-dotenv
+langchain
+langchain-google-genai
