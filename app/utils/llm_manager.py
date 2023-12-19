@@ -30,7 +30,7 @@ class GeminiLLMManager:
         model = ChatGoogleGenerativeAI(model="gemini-pro", convert_system_message_to_human=True)
         model(
             [
-                SystemMessage(content="Please describe the image."),
+                SystemMessage(content=settings.SYSTEM_INSTRUCTION),
             ]
         )
         return model
@@ -39,11 +39,21 @@ class GeminiLLMManager:
         llm = ChatGoogleGenerativeAI(model="gemini-pro-vision", convert_system_message_to_human=True)
         llm(
             [
-                SystemMessage(content="Answer only yes or no."),
+                SystemMessage(content=settings.SYSTEM_INSTRUCTION),
             ]
         )
 
         return llm
 
-    async def generate_async_response(self, message, conversation_id):
-        pass
+    async def generate_async_response(self, message: str, conversation_id: str, image: bool = False,
+                                      image_url: str = None):
+        if image:
+            model = await self.get_gemini_pro_vision_model()
+        else:
+            model = await self.get_gemini_pro_text_model()
+
+        response = ""
+        async for chunk in model.astream(message):
+            response += chunk.content
+            yield chunk.content
+        await self.add_conversation_to_memory(conversation_id, message, response)
