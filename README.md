@@ -87,3 +87,17 @@ The API will be available at http://localhost:8000.
 - Google Gemini API team
 - Langchain contributors
 - FastAPI community
+
+## Demo
+
+### Image-Based Conversation
+
+- Coming soon
+
+### Text-Based Conversation
+
+- Coming soon
+
+### Video
+
+- Coming soon
