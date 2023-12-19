@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pillow
+python-dotenv
+redis
+langchain
+langchain-google-genai
+pydantic-settings
