@@ -29,8 +29,8 @@ class MessageHandler:
             logger.error(f"Error in send_message: {e}")
             raise
 
-    async def flush_project_cache(self, project_id: str):
+    async def flush_conversation_cache(self, project_id: str):
         await self.cache_manager.flush_conversation_cache(project_id)
 
-    async def save_project_config(self, project_id: str, config: Dict):
+    async def save_conversation_config(self, project_id: str, config: Dict):
         await self.cache_manager.save_conversation_config(project_id, config)
