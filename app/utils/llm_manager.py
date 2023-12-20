@@ -60,26 +60,36 @@ class GeminiLLMManager:
                                       ) -> AsyncIterable[str]:
 
         model = self.get_gemini_model(image)
-
         # memory = self.create_or_get_memory(conversation_id=conversation_id)
-        # print("memory", memory)
+        # logger.error("memory", memory)
 
-        task = asyncio.create_task(
-            self.wrap_done(model.agenerate(
-                messages=[[
-                    SystemMessage(content=settings.GEMINI_SYSTEM_PROMPT),
-                    HumanMessage(content=message)
-                ]]
-            ),
-                self.callback.done
-            ),
+        # task = asyncio.create_task(
+        #     self.wrap_done(model.agenerate(
+        #         messages=[[
+        #             SystemMessage(content=settings.SYSTEM_INSTRUCTION),
+        #             HumanMessage(content=message)
+        #         ]]
+        #     ),
+        #         self.callback.done
+        #     ),
+        # )
+        #
+        # response = ""
+        # async for token in self.callback.aiter():
+        #     response += str(token)
+        #     logger.error("token %s", token)
+        #     yield token
+        #
+        # await task
+
+        response = await model.agenerate(
+            messages=[[
+                SystemMessage(content=settings.SYSTEM_INSTRUCTION),
+                HumanMessage(content=message)
+            ]]
         )
-
-        response = ""
-        async for token in self.callback.aiter():
-            response += str(token)
-            yield token
-
-        await task
+        for token in response.generations[0][0].text:
+            print(f"{repr(token)}".encode("utf-8", errors="replace"))
+            yield f"{repr(token)}".encode("utf-8", errors="replace")
 
         # await self.add_conversation_to_memory(conversation_id, message, response)
