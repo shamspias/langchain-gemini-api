@@ -27,7 +27,9 @@ class GeminiLLMManager:
         history.save_context({"input": user_message}, {"output": ai_message})
 
     async def get_gemini_pro_text_model(self):
-        model = ChatGoogleGenerativeAI(model="gemini-pro", convert_system_message_to_human=True)
+        model = ChatGoogleGenerativeAI(google_api_key=settings.GEMINI_API_KEY,
+                                       model="gemini-pro",
+                                       convert_system_message_to_human=True)
         model(
             [
                 SystemMessage(content=settings.SYSTEM_INSTRUCTION),
@@ -36,14 +38,17 @@ class GeminiLLMManager:
         return model
 
     async def get_gemini_pro_vision_model(self):
-        llm = ChatGoogleGenerativeAI(model="gemini-pro-vision", convert_system_message_to_human=True)
-        llm(
+        model = ChatGoogleGenerativeAI(google_api_key=settings.GEMINI_API_KEY,
+                                       model="gemini-pro-vision",
+                                       convert_system_message_to_human=True
+                                       )
+        model(
             [
                 SystemMessage(content=settings.SYSTEM_INSTRUCTION),
             ]
         )
 
-        return llm
+        return model
 
     async def generate_async_response(self, message: str, conversation_id: str, image: bool = False,
                                       image_url: str = None):
@@ -51,6 +56,9 @@ class GeminiLLMManager:
             model = await self.get_gemini_pro_vision_model()
         else:
             model = await self.get_gemini_pro_text_model()
+
+        memory = self.create_or_get_memory(conversation_id=conversation_id)
+        print("memory", memory)
 
         response = ""
         async for chunk in model.astream(message):
