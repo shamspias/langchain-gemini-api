@@ -3,6 +3,7 @@ from app.api.endpoints.v1 import conversation, conversation_vision, conversation
 
 api_router = APIRouter()
 
-api_router.include_router(conversation.router, prefix="/api/v1", tags=["conversation"])
-api_router.include_router(conversation_vision.router, prefix="/api/v1", tags=["conversation-vision"])
-api_router.include_router(conversation_delete.router, prefix="/api/v1", tags=["conversation-delete"])
+api_router.include_router(conversation.router, prefix="/api/v1/conversations", tags=["conversation"])
+api_router.include_router(conversation_vision.router, prefix="/api/v1/vision-conversations",
+                          tags=["conversation-vision"])
+api_router.include_router(conversation_delete.router, prefix="/api/v1/delete", tags=["conversation-delete"])
