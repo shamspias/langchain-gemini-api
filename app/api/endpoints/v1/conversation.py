@@ -13,7 +13,7 @@ cache_manager = CacheManager(settings.REDIS_URL)
 message_handler = MessageHandler(cache_manager)
 
 
-@router.post("/conversations/{conversation_id}")
+@router.post("/{conversation_id}")
 async def chat_with_model(conversation_id: str, chat_request: ChatRequest, api_key: str = Depends(verify_api_key)):
     try:
         message = chat_request.query
