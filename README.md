@@ -110,6 +110,8 @@ The API will be available at http://localhost:8000.
 ## Demo
 
 ### Conversation
+#### With telegram bot use this one: https://t.me/rim_nova_bot
+#### This is the telegram bot repo: [Gemini-Telegram-Bot](https://github.com/shamspias/gemini-telegram-bot)
 
 ![Conversation](/media/images/conversation_1.png)
 ![Conversation](/media/images/conversation_2.png)
