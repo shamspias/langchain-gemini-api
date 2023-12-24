@@ -1,0 +1,106 @@
+name: Gemini API Service Deploy CI/CD Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Copy Files to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          password: ${{ secrets.EC2_PASSWORD }}
+          source: "."
+          target: "/home/ubuntu/langchain-gemini-api-service"
+
+      - name: SSH Remote Commands
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          password: ${{ secrets.EC2_PASSWORD }}
+          script: |
+            echo "Running commands on remote server"
+            
+            # go to the project directory
+            cd /home/ubuntu/langchain-gemini-api-service
+            
+            # remove the old venv
+            sudo rm -r venv
+            
+            # install python3-venv
+            python3.11 -m venv venv
+            . venv/bin/activate
+            pip install -r requirements.txt
+            
+            # Add environment variables to the .env file
+            
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+            echo "REDIS_URL=${{ secrets.REDIS_URL }} >> .env
+            echo "MY_API_KEY=${{ secrets.MY_API_KEY }}" >> .env
+            echo "SYSTEM_INSTRUCTION=${{ secrets.SYSTEM_INSTRUCTION }}" >> .env
+            
+            
+            # Ensure the NGINX config directories are clean
+            sudo rm -f /etc/nginx/sites-enabled/gemini_api_service
+            sudo rm -f /etc/nginx/sites-available/gemini_api_service
+
+            # Create and configure the NGINX configuration file for the manual proxy
+            echo "server {
+            listen 80;
+            server_name ${{ secrets.DOMAIN_NAME }};
+            location / {
+                proxy_pass http://localhost:8090;
+                proxy_set_header Host \$host;
+                proxy_set_header X-Real-IP \$remote_addr;
+                proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto \$scheme;
+            }
+            }" | sudo tee /etc/nginx/sites-available/gemini_api_service
+            
+            # Debug: Check if the file was created
+            sudo ls -l /etc/nginx/sites-available/
+
+            # Link the file and reload NGINX
+            if [ -f /etc/nginx/sites-available/gemini_api_service ]; then
+                sudo ln -s /etc/nginx/sites-available/gemini_api_service /etc/nginx/sites-enabled/
+                sudo nginx -t && sudo systemctl reload nginx
+            else
+                echo "NGINX configuration file not created."
+            fi
+            
+            # Remove the old systemd service file if it exists
+            sudo rm -f /etc/systemd/system/gemini_api_service.service
+
+            # Create systemd service file for the Docker container
+            echo "[Unit]
+            Description=Scraper Uvicorn Service
+            After=network.target
+            
+            [Service]
+            User=ubuntu
+            Group=www-data
+            WorkingDirectory=/home/ubuntu/langchain-gemini-api-service
+            ExecStart=/home/ubuntu/langchain-gemini-api-service/venv/bin/uvicorn \
+            --host 0.0.0.0 \
+            --port 8090 \
+            --workers 3 \
+            app.main:app
+            
+            [Install]
+            WantedBy=multi-user.target" | sudo tee /etc/systemd/system/gemini_api_service.service
+
+            # Reload systemd, enable and start the service
+            sudo systemctl daemon-reload
+            sudo systemctl enable gemini_api_service.service
+            sudo systemctl start gemini_api_service.service
+            sudo systemctl restart gemini_api_service

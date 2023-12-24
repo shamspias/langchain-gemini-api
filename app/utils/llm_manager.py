@@ -80,7 +80,7 @@ class GeminiLLMManager:
 
         else:
             if image_url and image:
-                message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + history + [
+                message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + [
                     HumanMessage(
                         content=[
                             {
