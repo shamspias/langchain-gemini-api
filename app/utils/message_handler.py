@@ -30,6 +30,10 @@ class MessageHandler:
             raise
 
     async def flush_conversation_cache(self, project_id: str):
+        # LLM configuration
+        llm_manager = GeminiLLMManager()
+        history = llm_manager.create_or_get_memory(project_id)
+        history.clear()
         await self.cache_manager.flush_conversation_cache(project_id)
 
     async def save_conversation_config(self, project_id: str, config: Dict):
