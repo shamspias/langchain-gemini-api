@@ -1,6 +1,5 @@
-import asyncio
 import logging
-from typing import Awaitable, AsyncIterable
+from typing import AsyncIterable
 
 from langchain.schema.messages import HumanMessage, SystemMessage
 from langchain.memory.chat_message_histories import RedisChatMessageHistory
@@ -60,14 +59,41 @@ class GeminiLLMManager:
         history = chat_memory["chat_history"]
 
         if not history:
-            message_list = [
-                SystemMessage(content=settings.SYSTEM_INSTRUCTION),
-                HumanMessage(content=message)
-            ]
+            if image_url:
+                message_list = [
+                    SystemMessage(content=settings.SYSTEM_INSTRUCTION),
+                    HumanMessage(
+                        content=[
+                            {
+                                "type": "text",
+                                "text": message,
+                            },  # You can optionally provide text parts
+                            {"type": "image_url", "image_url": image_url},
+                        ]
+                    )
+                ]
+            else:
+                message_list = [
+                    SystemMessage(content=settings.SYSTEM_INSTRUCTION),
+                    HumanMessage(content=message)
+                ]
 
         else:
-            message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + history + [
-                HumanMessage(content=message)]
+            if image_url:
+                message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + history + [
+                    HumanMessage(
+                        content=[
+                            {
+                                "type": "text",
+                                "text": message,
+                            },  # You can optionally provide text parts
+                            {"type": "image_url", "image_url": image_url},
+                        ]
+                    )
+                ]
+            else:
+                message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + history + [
+                    HumanMessage(content=message)]
         response = ""
 
         async for token in model.astream(input=message_list):
