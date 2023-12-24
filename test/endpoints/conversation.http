@@ -1,9 +1,9 @@
 ### Test POST to /conversations with conversation_id
 
-POST http://127.0.0.1:8000/api/v1/conversations/12345
+POST http://127.0.0.1:8000/api/v1/conversations/12abc
 Content-Type: application/json
 x-api-key: 1234567890
 
 {
-  "query": "Hi there! My name is Sam. What's your name? I'm looking for a new job. What do you do for a living?"
+  "query": "Tell me more about it"
 }
