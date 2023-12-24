@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from app.utils.message_handler import MessageHandler
 from app.utils.cache_manager import CacheManager
 
@@ -9,7 +9,10 @@ router = APIRouter()
 
 
 @router.delete("/{conversation_id}")
-async def config_update(conversation_id: str, api_key: str = Depends(verify_api_key)):
+async def config_update(conversation_id: str,
+                        api_key: str = Depends(verify_api_key),
+                        x_api_key: str = Header(None, alias='x-api-key')
+                        ):
     cache_manager = CacheManager(settings.REDIS_URL)
     message_handler = MessageHandler(cache_manager)
 

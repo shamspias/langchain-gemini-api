@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .routers.api_v1 import api_router
 
-app = FastAPI()
+app = FastAPI(title="Gemini Vision API", version="0.0.1")
 
 # Configure CORS
 app.add_middleware(

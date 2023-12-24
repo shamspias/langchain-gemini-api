@@ -59,7 +59,7 @@ class GeminiLLMManager:
         history = chat_memory["chat_history"]
 
         if not history:
-            if image_url:
+            if image_url and image:
                 message_list = [
                     SystemMessage(content=settings.SYSTEM_INSTRUCTION),
                     HumanMessage(
@@ -79,7 +79,7 @@ class GeminiLLMManager:
                 ]
 
         else:
-            if image_url:
+            if image_url and image:
                 message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + history + [
                     HumanMessage(
                         content=[
