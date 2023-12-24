@@ -1,0 +1,11 @@
+### Test POST to /conversations with conversation_id
+
+POST http://127.0.0.1:8000/api/v1/conversations/12abc
+Content-Type: application/json
+x-api-key: 1234567890
+
+{
+  "query": "What's in this image?",
+  "image": true,
+  "image_url": "https://picsum.photos/seed/picsum/300/300"
+}
