@@ -94,10 +94,10 @@ The API will be available at http://localhost:8000.
 - **/delete/<conversation_id>**: Endpoint to delete conversation data.
 
 ## API Documentation
-
+- **/docs**: [Swagger UI for API documentation](http://127.0.0.1:8000/docs).
+- **/redoc**: [ReDoc UI for API documentation](http://127.0.0.1:8000/redoc).
 
 ## Acknowledgments
-
 - Google Gemini API team
 - [Langchain contributors](https://python.langchain.com/docs/integrations/chat/google_generative_ai)
 - FastAPI community
