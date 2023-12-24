@@ -21,31 +21,24 @@ class GeminiLLMManager:
         self.callback = AsyncIteratorCallbackHandler()
 
     def create_or_get_memory(self, conversation_id):
-        message_history = RedisChatMessageHistory(url=settings.REDIS_MEMORY_URL, ttl=600, session_id=conversation_id)
+        message_history = RedisChatMessageHistory(url=settings.REDIS_URL, ttl=600, session_id=conversation_id)
         return ConversationBufferMemory(memory_key="chat_history", chat_memory=message_history, return_messages=True)
 
     async def add_conversation_to_memory(self, conversation_id, user_message, ai_message):
         history = self.create_or_get_memory(conversation_id)
         history.save_context({"input": user_message}, {"output": ai_message})
 
-    async def wrap_done(self, fn: Awaitable, event: asyncio.Event):
-        try:
-            await fn
-        except Exception as e:
-            logger.error(f"Error in wrap_done: {e}")
-            raise
-        finally:
-            event.set()
-
     def get_gemini_model(self, image: bool = False):
         if image:
             model = ChatGoogleGenerativeAI(google_api_key=settings.GEMINI_API_KEY,
+                                           stream=True,
                                            model="gemini-pro-vision",
                                            convert_system_message_to_human=True,
                                            callbacks=[self.callback],
                                            )
         else:
             model = ChatGoogleGenerativeAI(google_api_key=settings.GEMINI_API_KEY,
+                                           stream=True,
                                            model="gemini-pro",
                                            convert_system_message_to_human=True,
                                            callbacks=[self.callback],
@@ -63,33 +56,12 @@ class GeminiLLMManager:
         # memory = self.create_or_get_memory(conversation_id=conversation_id)
         # logger.error("memory", memory)
 
-        # task = asyncio.create_task(
-        #     self.wrap_done(model.agenerate(
-        #         messages=[[
-        #             SystemMessage(content=settings.SYSTEM_INSTRUCTION),
-        #             HumanMessage(content=message)
-        #         ]]
-        #     ),
-        #         self.callback.done
-        #     ),
-        # )
-        #
-        # response = ""
-        # async for token in self.callback.aiter():
-        #     response += str(token)
-        #     logger.error("token %s", token)
-        #     yield token
-        #
-        # await task
+        message = [
+            SystemMessage(content=settings.SYSTEM_INSTRUCTION),
+            HumanMessage(content=message)
+        ]
 
-        response = await model.agenerate(
-            messages=[[
-                SystemMessage(content=settings.SYSTEM_INSTRUCTION),
-                HumanMessage(content=message)
-            ]]
-        )
-        for token in response.generations[0][0].text:
-            print(f"{repr(token)}".encode("utf-8", errors="replace"))
-            yield f"{repr(token)}".encode("utf-8", errors="replace")
+        async for token in model.astream(input=message):
+            yield f"{repr(token.content)}".encode("utf-8", errors="replace")
 
         # await self.add_conversation_to_memory(conversation_id, message, response)
