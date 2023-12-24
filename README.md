@@ -89,8 +89,7 @@ The API will be available at http://localhost:8000.
 
 ## API Endpoints
 
-- **/conversations/<conversation_id>**: Endpoint for text-based conversations.
-- **/vision-conversations/<conversation_id>**: Endpoint for image-based conversations.
+- **/conversations/<conversation_id>**: Endpoint for text and image based conversations.
 - **/delete/<conversation_id>**: Endpoint to delete conversation data.
 
 ## API Documentation
