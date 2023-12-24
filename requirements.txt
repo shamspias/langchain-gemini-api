@@ -6,3 +6,4 @@ redis
 langchain
 langchain-google-genai
 pydantic-settings
+ipython
