@@ -4,7 +4,7 @@ from typing import Awaitable, AsyncIterable
 
 from langchain.schema.messages import HumanMessage, SystemMessage
 from langchain.memory.chat_message_histories import RedisChatMessageHistory
-from langchain.memory import ConversationBufferMemory
+from langchain.memory import ConversationBufferWindowMemory
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.callbacks import AsyncIteratorCallbackHandler
 
@@ -22,7 +22,9 @@ class GeminiLLMManager:
 
     def create_or_get_memory(self, conversation_id):
         message_history = RedisChatMessageHistory(url=settings.REDIS_URL, ttl=600, session_id=conversation_id)
-        return ConversationBufferMemory(memory_key="chat_history", chat_memory=message_history, return_messages=True)
+        return ConversationBufferWindowMemory(memory_key="chat_history", chat_memory=message_history,
+                                              return_messages=True,
+                                              max_token_limit=4000)
 
     async def add_conversation_to_memory(self, conversation_id, user_message, ai_message):
         history = self.create_or_get_memory(conversation_id)
@@ -53,15 +55,23 @@ class GeminiLLMManager:
                                       ) -> AsyncIterable[str]:
 
         model = self.get_gemini_model(image)
-        # memory = self.create_or_get_memory(conversation_id=conversation_id)
-        # logger.error("memory", memory)
+        memory = self.create_or_get_memory(conversation_id=conversation_id)
+        chat_memory = memory.load_memory_variables({})
+        history = chat_memory["chat_history"]
 
-        message = [
-            SystemMessage(content=settings.SYSTEM_INSTRUCTION),
-            HumanMessage(content=message)
-        ]
+        if not history:
+            message_list = [
+                SystemMessage(content=settings.SYSTEM_INSTRUCTION),
+                HumanMessage(content=message)
+            ]
 
-        async for token in model.astream(input=message):
+        else:
+            message_list = [SystemMessage(content=settings.SYSTEM_INSTRUCTION)] + history + [
+                HumanMessage(content=message)]
+        response = ""
+
+        async for token in model.astream(input=message_list):
+            response += f"{repr(token.content)}"
             yield f"{repr(token.content)}".encode("utf-8", errors="replace")
 
-        # await self.add_conversation_to_memory(conversation_id, message, response)
+        await self.add_conversation_to_memory(conversation_id, message, response)
