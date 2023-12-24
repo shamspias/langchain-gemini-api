@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Header, Response
 from app.utils.message_handler import MessageHandler
 from app.utils.cache_manager import CacheManager
 
@@ -18,5 +18,6 @@ async def config_update(conversation_id: str,
 
     try:
         await message_handler.flush_conversation_cache(conversation_id)
+        return Response(status_code=200)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
