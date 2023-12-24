@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from fastapi.responses import StreamingResponse
 from app.schemas import ChatRequest
 from app.utils.message_handler import MessageHandler
@@ -14,7 +14,11 @@ message_handler = MessageHandler(cache_manager)
 
 
 @router.post("/{conversation_id}")
-async def chat_with_model(conversation_id: str, chat_request: ChatRequest, api_key: str = Depends(verify_api_key)):
+async def chat_with_model(conversation_id: str,
+                          chat_request: ChatRequest,
+                          api_key: str = Depends(verify_api_key),
+                          x_api_key: str = Header(None, alias='x-api-key')
+                          ):
     try:
         message = chat_request.query
         image = chat_request.image
