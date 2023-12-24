@@ -19,7 +19,9 @@ ephemeral conversation storage.
 ## Getting Started
 
 ### Prerequisites for Google Gemini API
-- Get a [Google Gemini AI API key here](https://makersuite.google.com/app/apikey) and add it to Secrets in your Repl with the key GOOGLE_API_KEY.
+
+- Get a [Google Gemini AI API key here](https://makersuite.google.com/app/apikey) and add it to Secrets in your Repl
+  with the key GOOGLE_API_KEY.
 
 ### Prerequisites for langchain-gemini-api
 
@@ -68,7 +70,9 @@ ephemeral conversation storage.
     cd langchain-gemini-api
     pip install -r requirements.txt
     ```
+
 ## Configuration
+
 1. Create a `.env` file in the project directory and add the following:
     ```bash
     GEMINI_API_KEY=<your_google_gemini_api_key> # e.g. "1234567890"
@@ -93,23 +97,22 @@ The API will be available at http://localhost:8000.
 - **/delete/<conversation_id>**: Endpoint to delete conversation data.
 
 ## API Documentation
+
 - **/docs**: [Swagger UI for API documentation](http://127.0.0.1:8000/docs).
 - **/redoc**: [ReDoc UI for API documentation](http://127.0.0.1:8000/redoc).
 
 ## Acknowledgments
+
 - Google Gemini API team
 - [Langchain contributors](https://python.langchain.com/docs/integrations/chat/google_generative_ai)
 - FastAPI community
 
 ## Demo
 
-### Image-Based Conversation
+### Conversation
 
-- Coming soon
-
-### Text-Based Conversation
-
-- Coming soon
+![Conversation](/media/images/conversation_1.png)
+![Conversation](/media/images/conversation_2.png)
 
 ### Video
 
