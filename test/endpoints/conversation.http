@@ -5,5 +5,5 @@ Content-Type: application/json
 x-api-key: 1234567890
 
 {
-  "query": "Hello, how can I help you?"
+  "query": "Hi there! My name is Sam. What's your name? I'm looking for a new job. What do you do for a living?"
 }
