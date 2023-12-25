@@ -43,6 +43,9 @@ jobs:
             pip install -r requirements.txt
             
             # Add environment variables to the .env file
+            # remove the old .env file
+            sudo rm -f .env
+            
             echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
             echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
             echo "MY_API_KEY=${{ secrets.MY_API_KEY }}" >> .env
