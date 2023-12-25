@@ -43,10 +43,10 @@ jobs:
             pip install -r requirements.txt
             
             # Add environment variables to the .env file
-            echo 'GEMINI_API_KEY="${{ secrets.GEMINI_API_KEY }}"' >> .env
-            echo 'REDIS_URL="${{ secrets.REDIS_URL }}"' >> .env
-            echo 'MY_API_KEY="${{ secrets.MY_API_KEY }}"' >> .env
-            echo 'SYSTEM_INSTRUCTION="${{ secrets.SYSTEM_INSTRUCTION }}"' >> .env
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env
+            echo "REDIS_URL=${{ secrets.REDIS_URL }}" >> .env
+            echo "MY_API_KEY=${{ secrets.MY_API_KEY }}" >> .env
+            echo "SYSTEM_INSTRUCTION=${{ secrets.SYSTEM_INSTRUCTION }}" >> .env
             
             
             # Ensure the NGINX config directories are clean
