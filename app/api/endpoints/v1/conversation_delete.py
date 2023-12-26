@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends, Header, Response
 from app.utils.message_handler import MessageHandler
-from app.utils.cache_manager import CacheManager
+from app.utils.llm_manager import GeminiLLMManager
 
 from app.permissions import verify_api_key
 from app.config import settings
@@ -13,8 +13,8 @@ async def config_update(conversation_id: str,
                         api_key: str = Depends(verify_api_key),
                         x_api_key: str = Header(None, alias='x-api-key')
                         ):
-    cache_manager = CacheManager(settings.REDIS_URL)
-    message_handler = MessageHandler(cache_manager)
+    llm_manager = GeminiLLMManager()
+    message_handler = MessageHandler(llm_manager)
 
     try:
         await message_handler.flush_conversation_cache(conversation_id)

@@ -2,15 +2,14 @@ from fastapi import APIRouter, HTTPException, Depends, Header
 from fastapi.responses import StreamingResponse
 from app.schemas import ChatRequest
 from app.utils.message_handler import MessageHandler
-from app.utils.cache_manager import CacheManager
+from app.utils.llm_manager import GeminiLLMManager
 
 from app.permissions import verify_api_key
-from app.config import settings
 
 router = APIRouter()
 
-cache_manager = CacheManager(settings.REDIS_URL)
-message_handler = MessageHandler(cache_manager)
+llm_manager = GeminiLLMManager()
+message_handler = MessageHandler(llm_manager)
 
 
 @router.post("/{conversation_id}")
