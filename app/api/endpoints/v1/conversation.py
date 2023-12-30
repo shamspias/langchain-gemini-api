@@ -16,7 +16,7 @@ message_handler = MessageHandler(llm_manager)
 async def chat_with_model(conversation_id: str,
                           chat_request: ChatRequest,
                           api_key: str = Depends(verify_api_key),
-                          x_api_key: str = Header(None, alias='x-api-key')
+                          X_Project_Id: str = Header(None, alias='X-Project-Id')
                           ):
     try:
         message = chat_request.query
